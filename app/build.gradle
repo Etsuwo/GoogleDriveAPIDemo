@@ -26,6 +26,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -41,6 +44,13 @@ dependencies {
 
     // Google
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
+    implementation 'com.google.http-client:google-http-client-gson:1.42.2'
+    implementation ('com.google.api-client:google-api-client-android:2.0.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    implementation('com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
