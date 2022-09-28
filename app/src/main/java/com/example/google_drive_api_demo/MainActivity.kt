@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.google_drive_api_demo.api.DriveAPIProvider
+import com.example.google_drive_api_demo.ui.folder.FolderActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -41,14 +42,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Googleアカウントからの情報取得の許可（認可）
-    private val handleRecoverableResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this, "認可完了", Toast.LENGTH_LONG).show()
-            fetchFiles()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val gso = GoogleSignInOptions
@@ -72,27 +65,10 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 DriveAPIProvider.connectDrive(intent)
-                fetchFiles()
+                val intent = Intent(this@MainActivity, FolderActivity::class.java)
+                startActivity(intent)
             } catch (e: Exception) {
                 Toast.makeText(this@MainActivity, e.toString(), Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun fetchFiles() {
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val fileList = DriveAPIProvider.queryFiles()
-                val builder = StringBuilder()
-                fileList.files.forEach { builder.append(it.name).append("\n") }
-                Toast.makeText(this@MainActivity, builder.toString(), Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                when (e) {
-                    is UserRecoverableAuthIOException -> { // Driveアクセスの認可がない
-                        handleRecoverableResult.launch(e.intent)
-                    }
-                    else -> Toast.makeText(this@MainActivity, e.toString(), Toast.LENGTH_LONG).show()
-                }
             }
         }
     }
