@@ -30,7 +30,8 @@ object DriveAPIProvider {
         GoogleSignIn.getSignedInAccountFromIntent(intent)
             .addOnSuccessListener {
                 val credential = GoogleAccountCredential.usingOAuth2(
-                    GoogleDriveDemoApplication.app.applicationContext, Collections.singleton(DriveScopes.DRIVE_READONLY)
+                    GoogleDriveDemoApplication.app.applicationContext,
+                    listOf(DriveScopes.DRIVE_READONLY, DriveScopes.DRIVE_METADATA)
                 )
                 credential.selectedAccount = it.account
                 drive = Drive.Builder(
@@ -47,9 +48,13 @@ object DriveAPIProvider {
 
     // rootはマイドライブのルートフォルダIDのエイリアス
     // https://developers.google.com/drive/api/guides/search-files
-    suspend fun queryFiles(): FileList = withContext(Dispatchers.IO) {
+    suspend fun queryFiles(folderId: String): FileList = withContext(Dispatchers.IO) {
         drive.let {
-            return@withContext it.files().list().setSpaces("drive").setQ("'root' in parents").execute()
+            return@withContext it.files().list()
+                .setSpaces("drive")
+                .setQ("'$folderId' in parents")
+                .setFields("*")
+                .execute()
         }
     }
 }
