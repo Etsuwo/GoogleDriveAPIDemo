@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/folder_fragment">
+
+    <fragment
+        android:id="@+id/folder_fragment"
+        android:name="com.example.google_drive_api_demo.ui.folder.FolderFragment"
+        android:label="fragment_folder"
+        tools:layout="@layout/fragment_folder" />
+</navigation>
