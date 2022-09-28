@@ -31,6 +31,8 @@ class FolderFragment : Fragment() {
     }
 
     companion object {
+        private const val FILE_MIME_TYPE = "image/jpeg"
+
         private const val FOLDER_ID_KEY = "FOLDER_ID"
         fun createBundle(folderId: String) = Bundle().also {
             it.putString(FOLDER_ID_KEY, folderId)
@@ -65,18 +67,20 @@ class FolderFragment : Fragment() {
             try {
                 val folderId = loadFolderId()
                 val adapter = RecyclerViewAdapter(emptyList()) {
-                    val args = createBundle(it.id)
-                    findNavController().navigate(R.id.folder_fragment, args)
+                    if (it.mimeType == FILE_MIME_TYPE) {
+                        Toast.makeText(requireContext(), it.webContentUrl, Toast.LENGTH_LONG).show()
+                    } else {
+                        val args = createBundle(it.id)
+                        findNavController().navigate(R.id.folder_fragment, args)
+                    }
                 }
                 recyclerView.adapter = adapter
                 recyclerView.layoutManager = LinearLayoutManager(requireContext())
                 val fileList = DriveAPIProvider.queryFiles(folderId)
                 val driveItemList = fileList.files.map { file ->
-                    if (file.hasThumbnail) {
-                        DriveItem(file.thumbnailLink, file.name, file.id)
-                    } else {
-                        DriveItem(file.iconLink, file.name, file.id)
-                    }
+                    val thumbnail = if (file.hasThumbnail) file.thumbnailLink else file.iconLink
+                    val contentUrl = if (file.mimeType == FILE_MIME_TYPE) file.webContentLink else null
+                    DriveItem(file.id, file.name, file.mimeType, thumbnail, contentUrl)
                 }
                 adapter.list = driveItemList
                 adapter.notifyDataSetChanged()
