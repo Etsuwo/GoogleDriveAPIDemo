@@ -2,7 +2,6 @@ package com.example.google_drive_api_demo.ui.folder
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.google_drive_api_demo.R
 import com.example.google_drive_api_demo.api.DriveAPIProvider
+import com.example.google_drive_api_demo.ui.image.ImageFragment
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +68,8 @@ class FolderFragment : Fragment() {
                 val folderId = loadFolderId()
                 val adapter = RecyclerViewAdapter(emptyList()) {
                     if (it.mimeType == FILE_MIME_TYPE) {
-                        Toast.makeText(requireContext(), it.webContentUrl, Toast.LENGTH_LONG).show()
+                        val args = ImageFragment.createBundle(it.id)
+                        findNavController().navigate(R.id.image_fragment, args)
                     } else {
                         val args = createBundle(it.id)
                         findNavController().navigate(R.id.folder_fragment, args)
@@ -79,8 +80,7 @@ class FolderFragment : Fragment() {
                 val fileList = DriveAPIProvider.queryFiles(folderId)
                 val driveItemList = fileList.files.map { file ->
                     val thumbnail = if (file.hasThumbnail) file.thumbnailLink else file.iconLink
-                    val contentUrl = if (file.mimeType == FILE_MIME_TYPE) file.webContentLink else null
-                    DriveItem(file.id, file.name, file.mimeType, thumbnail, contentUrl)
+                    DriveItem(file.id, file.name, file.mimeType, thumbnail)
                 }
                 adapter.list = driveItemList
                 adapter.notifyDataSetChanged()

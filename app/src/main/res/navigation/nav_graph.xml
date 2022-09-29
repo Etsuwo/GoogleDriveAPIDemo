@@ -10,4 +10,9 @@
         android:name="com.example.google_drive_api_demo.ui.folder.FolderFragment"
         android:label="fragment_folder"
         tools:layout="@layout/fragment_folder" />
+    <fragment
+        android:id="@+id/image_fragment"
+        android:name="com.example.google_drive_api_demo.ui.image.ImageFragment"
+        android:label="fragment_image"
+        tools:layout="@layout/fragment_image" />
 </navigation>

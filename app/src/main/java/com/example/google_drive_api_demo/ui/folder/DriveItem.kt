@@ -5,5 +5,4 @@ data class DriveItem(
     val fileName: String,
     val mimeType: String,
     val imageUrl: String,
-    val webContentUrl: String?,
 )
