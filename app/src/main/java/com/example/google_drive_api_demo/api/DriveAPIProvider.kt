@@ -1,6 +1,8 @@
 package com.example.google_drive_api_demo.api
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.widget.Toast
 import com.example.google_drive_api_demo.R
 import com.example.google_drive_api_demo.application.GoogleDriveDemoApplication
@@ -17,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.util.Collections
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -55,6 +58,15 @@ object DriveAPIProvider {
                 .setQ("'$folderId' in parents")
                 .setFields("*")
                 .execute()
+        }
+    }
+
+    suspend fun downloadImage(fileId: String): Bitmap = withContext(Dispatchers.IO) {
+        drive.let {
+            val output = ByteArrayOutputStream()
+            it.files().get(fileId).executeMediaAndDownloadTo(output)
+            val bytes = output.toByteArray()
+            return@withContext BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         }
     }
 }
