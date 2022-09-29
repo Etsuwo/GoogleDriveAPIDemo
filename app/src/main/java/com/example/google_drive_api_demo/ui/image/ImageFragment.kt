@@ -6,8 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.google_drive_api_demo.R
+import com.example.google_drive_api_demo.api.DriveAPIProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ImageFragment : Fragment() {
 
@@ -29,7 +34,19 @@ class ImageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val fileId = requireArguments().getString(FILE_ID_KEY)
+        val fileId = requireArguments().getString(FILE_ID_KEY) ?: ""
         val imageView = view.findViewById<ImageView>(R.id.downloaded_image)
+        fetchImage(fileId, imageView)
+    }
+
+    private fun fetchImage(fileId: String, imageView: ImageView) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val bitmap = DriveAPIProvider.downloadImage(fileId)
+                imageView.setImageBitmap(bitmap)
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_LONG).show()
+            }
+        }
     }
 }
